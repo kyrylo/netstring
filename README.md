@@ -1,6 +1,8 @@
 Netstring
 =========
 
+[![Circle Build Status](https://circleci.com/gh/kyrylo/netstring.svg?style=shield)](https://circleci.com/gh/kyrylo/netstring)
+
 * [Netstring README][netstring-github]
 * [pkg.go.dev documentation][docs]
 
