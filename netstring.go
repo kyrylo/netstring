@@ -11,7 +11,7 @@ import (
 
 // We use Semantic Versioning v2.0.0
 // More information: http://semver.org/
-const Version = "0.0.0"
+const Version = "1.0.0"
 
 const (
 	// A netstring carries size information. It is encoded as 4-byte uint32
