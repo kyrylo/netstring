@@ -40,38 +40,54 @@ Example
 ### Parsing a byte string
 
 ```go
+package main
+
 import (
+	"bufio"
+	"bytes"
+	"fmt"
 	"log"
 
 	"github.com/kyrylo/netstring"
 )
 
 func main() {
-	s := "8:sunshine,"
+	// input: "8:sunshine,"
+	s := []byte{
+		0x08, 0x00, 0x00, 0x00, 0x3a, 0x73, 0x75,
+		0x6e, 0x73, 0x68, 0x69, 0x6e, 0x65, 0x2c,
+	}
 	b := bufio.NewReader(bytes.NewReader([]byte(s)))
 
 	parsed, err := netstring.Parse(b)
 	if err != nil {
 		log.Fatal(err)
+
 	}
 
-	fmt.Println(parsed) // "sunshine"
+	// output: "sunshine"
+	fmt.Println(string(parsed))
 }
 ```
 
 ### Packing bytes into a netstring
 
 ```go
-import (
-    "log"
+package main
 
-    "github.com/kyrylo/netstring"
+import (
+	"fmt"
+
+	"github.com/kyrylo/netstring"
 )
 
 func main() {
 	s := "sunshine"
-    packed := netstring.Pack([]byte(s))
-    fmt.Println(packed) // "sunshine"
+	packed := netstring.Pack([]byte(s))
+
+	// string: "8:sunshine,"
+	// bytes: [8 0 0 0 58 115 117 110 115 104 105 110 101 44]
+	fmt.Println(string(packed))
 }
 ```
 
