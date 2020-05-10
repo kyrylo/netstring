@@ -25,11 +25,6 @@ const (
 	suffixCh = ','
 )
 
-func ParseStr(s string) ([]byte, error) {
-	r := bufio.NewReader(bytes.NewReader([]byte(s)))
-	return Parse(r)
-}
-
 func Parse(r *bufio.Reader) ([]byte, error) {
 	strLen, err := parseLen(r)
 	if err != nil {
