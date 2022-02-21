@@ -23,7 +23,7 @@ Installation
 
 ### Go modules
 
-Gobrake can be installed like any other Go package that supports [Go
+Netstring can be installed like any other Go package that supports [Go
 modules][go-mod].
 
 #### Installing in an existing project
