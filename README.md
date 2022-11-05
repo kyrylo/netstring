@@ -94,8 +94,9 @@ func main() {
 Supported Go versions
 ---------------------
 
-The library supports Go v1.11+. The CI file would be the best source of truth
-because it contains all Go versions that are tested against.
+The library aims to support 3 latest Go versions. The [CI file][ci] would be the
+best source of truth because it contains all Go versions that are tested
+against.
 
 Contact
 -------
@@ -117,3 +118,4 @@ The project uses the MIT License. See LICENSE.md for details.
 [issues]: https://github.com/kyrylo/netstring/issues
 [twitter]: https://twitter.com/kyrylosilin
 [docs]: https://pkg.go.dev/github.com/kyrylo/netstring
+[ci]: https://github.com/kyrylo/netstring/blob/master/.github/workflows/test.yml
