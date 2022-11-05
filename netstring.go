@@ -6,7 +6,6 @@ import (
 	"encoding/binary"
 	"fmt"
 	"io"
-	"io/ioutil"
 )
 
 // We use Semantic Versioning v2.0.0
@@ -87,7 +86,7 @@ func stripPrefix(r *bufio.Reader) error {
 }
 
 func parseStr(r *bufio.Reader, len int) ([]byte, error) {
-	b, err := ioutil.ReadAll(io.LimitReader(r, int64(len)))
+	b, err := io.ReadAll(io.LimitReader(r, int64(len)))
 	if err != nil {
 		return []byte{}, err
 	}
