@@ -11,7 +11,7 @@ import (
 
 // We use Semantic Versioning v2.0.0
 // More information: http://semver.org/
-const Version = "1.0.0"
+const Version = "2.0.0"
 
 const (
 	// Prefix that comes after total string size
