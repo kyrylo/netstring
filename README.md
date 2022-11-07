@@ -1,13 +1,11 @@
-Netstring
-=========
+# Netstring
 
 [![.github/workflows/test.yml](https://github.com/kyrylo/netstring/actions/workflows/test.yml/badge.svg?branch=master)](https://github.com/kyrylo/netstring/actions/workflows/test.yml)
 
-* [Netstring README][netstring-github]
-* [pkg.go.dev documentation][docs]
+- [Netstring README][netstring-github]
+- [pkg.go.dev documentation][docs]
 
-Introduction
-------------
+## Introduction
 
 _Netstring_ is a library for packing and parsing [netstrings][netstring],
 self-delimiting encoding of strings. The library is extremely simple and well-tested.
@@ -18,8 +16,7 @@ strings may be encoded as netstrings and then concatenated into a sequence of
 characters, which in turn may be transmitted over a reliable stream protocol
 such as TCP.
 
-Installation
-------------
+## Installation
 
 ### Go modules
 
@@ -34,10 +31,9 @@ Just `go get` the library:
 go get github.com/kyrylo/netstring
 ```
 
-Example
--------
+## Example
 
-### Parsing a byte string
+### Parsing a netstring into a byte string
 
 ```go
 package main
@@ -52,61 +48,65 @@ import (
 )
 
 func main() {
-	// input: "8:sunshine,"
-	s := []byte{
-		0x08, 0x00, 0x00, 0x00, 0x3a, 0x73, 0x75,
-		0x6e, 0x73, 0x68, 0x69, 0x6e, 0x65, 0x2c,
+	// The netstring is "8:sunshine,"
+	netstr := []byte{
+		0x38, 0x3a, 0x73, 0x75, 0x6e, 0x73, 0x68, 0x69, 0x6e, 0x65, 0x2c,
 	}
-	b := bufio.NewReader(bytes.NewReader([]byte(s)))
 
-	parsed, err := netstring.Parse(b)
+	// Create a reader.
+	buf := bufio.NewReader(bytes.NewReader(netstr))
+
+	// Parse the "8:sunshine," into "sunshine".
+	str, err := netstring.Parse(buf)
 	if err != nil {
 		log.Fatal(err)
-
 	}
 
-	// output: "sunshine"
-	fmt.Println(string(parsed))
+	// Output: "sunshine"
+	fmt.Printf("Input netstring: %s\n", netstr)
+	fmt.Printf("  Parsed string: %s\n", str)
 }
 ```
 
-### Packing bytes into a netstring
+### Packing a byte string into a netstring
 
 ```go
 package main
 
 import (
 	"fmt"
+	"log"
 
 	"github.com/kyrylo/netstring"
 )
 
 func main() {
-	s := "sunshine"
-	packed := netstring.Pack([]byte(s))
+	s := []byte("sunshine")
+	netstr, err := netstring.Pack(s)
+	if err != nil {
+		log.Fatal(err)
+	}
 
-	// string: "8:sunshine,"
-	// bytes: [8 0 0 0 58 115 117 110 115 104 105 110 101 44]
-	fmt.Println(string(packed))
+	// netstr is "8:sunshine,"
+	// bytes: [0x38, 0x3a, 0x73, 0x75, 0x6e, 0x73, 0x68, 0x69, 0x6e, 0x65, 0x2c]
+	fmt.Printf("    Input string: %s\n", s)
+	fmt.Printf("Output netstring: %s\n", netstr)
 }
 ```
 
-Supported Go versions
----------------------
+## Supported Go versions
 
-The library supports Go v1.11+. The CI file would be the best source of truth
+The library supports Go v1.17+. The CI file would be the best source of truth
 because it contains all Go versions that are tested against.
 
-Contact
--------
+## Contact
 
 In case you have a problem, question or a bug report, feel free to:
 
-* [file an issue][issues]
-* [tweet at me][twitter]
+- [file an issue][issues]
+- [tweet at me][twitter]
 
-License
--------
+## License
 
 The project uses the MIT License. See LICENSE.md for details.
 

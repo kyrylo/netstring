@@ -3,9 +3,10 @@ package netstring
 import (
 	"bufio"
 	"bytes"
-	"encoding/binary"
+	"errors"
 	"fmt"
 	"io"
+	"strconv"
 )
 
 // We use Semantic Versioning v2.0.0
@@ -13,10 +14,6 @@ import (
 const Version = "1.0.0"
 
 const (
-	// A netstring carries size information. It is encoded as 4-byte uint32
-	// number
-	byteSize = 4
-
 	// Prefix that comes after total string size
 	prefixCh = ':'
 
@@ -27,10 +24,6 @@ const (
 func Parse(r *bufio.Reader) ([]byte, error) {
 	strLen, err := parseLen(r)
 	if err != nil {
-		return []byte{}, err
-	}
-
-	if err = stripPrefix(r); err != nil {
 		return []byte{}, err
 	}
 
@@ -46,43 +39,45 @@ func Parse(r *bufio.Reader) ([]byte, error) {
 	return b, nil
 }
 
-func Pack(data []byte) []byte {
-	var b bytes.Buffer
-
-	strLen := make([]byte, 4)
-	binary.LittleEndian.PutUint32(strLen, uint32(len(data)))
-
-	b.Write(strLen)
-	b.WriteByte(prefixCh)
-	b.Write(data)
-	b.WriteByte(suffixCh)
-
-	return b.Bytes()
-}
-
 func parseLen(r *bufio.Reader) (int, error) {
-	sizeBuf := make([]byte, byteSize)
-	if _, err := io.ReadFull(r, sizeBuf); err != nil {
-		return 0, err
+	var b byte
+	var err error
+	var strLen int
+	var bytesRead int
+
+	for {
+		b, err = r.ReadByte()
+		if err != nil {
+			return 0, err
+		}
+		bytesRead++
+
+		if b == '0' && bytesRead == 1 {
+			if !assertPrefixAhead(r) {
+				return 0, errors.New("leading zeros at the front of length are prohibited")
+			}
+		} else if b == prefixCh {
+			break
+		} else if b < '0' || b > '9' {
+			return 0, fmt.Errorf(
+				"length number %d is not in the range of 0-9",
+				int(b-'0'),
+			)
+		}
+
+		strLen = strLen*10 + int(b-'0')
 	}
 
-	len := binary.LittleEndian.Uint32(sizeBuf[0:])
-	return int(len), nil
+	return strLen, err
 }
 
-func stripPrefix(r *bufio.Reader) error {
-	prefix, err := r.ReadByte()
+func assertPrefixAhead(r *bufio.Reader) bool {
+	peek, err := r.Peek(1)
 	if err != nil {
-		return err
-	}
-	if prefix != prefixCh {
-		return fmt.Errorf(
-			"got unexpected netstring prefix %c, wanted %c",
-			prefix, prefixCh,
-		)
+		return false
 	}
 
-	return nil
+	return peek[0] == prefixCh
 }
 
 func parseStr(r *bufio.Reader, len int) ([]byte, error) {
@@ -101,10 +96,21 @@ func stripSuffix(r *bufio.Reader) error {
 	}
 	if suffix != suffixCh {
 		return fmt.Errorf(
-			"got unexpected netstring suffix %c, wanted %c",
+			"unexpected suffix %c, wanted %c",
 			suffix, suffixCh,
 		)
 	}
 
 	return nil
+}
+
+func Pack(str []byte) ([]byte, error) {
+	var buf bytes.Buffer
+
+	buf.Write([]byte(strconv.FormatInt(int64(len(str)), 10)))
+	buf.WriteByte(prefixCh)
+	buf.Write([]byte(str))
+	buf.WriteByte(suffixCh)
+
+	return buf.Bytes(), nil
 }
